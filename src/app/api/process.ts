@@ -1,8 +1,11 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Octokit } from '@octokit/core';
+import OpenAI from "openai";
 
 // import utils here to make it easier
+
+const openai = new OpenAI();
 const octokit = new Octokit({
   auth: 'process.env.GITHUB_API_KEY'
 });
@@ -32,14 +35,12 @@ type GitHubFileContent = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // External service request
   // prase the request and get the repoOwner and repoName
-  const repoOwner = ''; // replace with the repo owner's username
-  const repoName = ''; // replace with the repository name
-
+  const { repoOwner, repoName, repoPath } = req.body;
 
   const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
     owner: repoOwner,
     repo: repoName,
-    path: '',
+    path: repoPath,
     headers: {
       'X-GitHub-Api-Version': '2022-11-28'
     }
@@ -69,14 +70,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const mdFilesContent: GitHubFileContent[] = await Promise.all(mdFilesContentPromises);
 
+    const contentString = await processData(mdFilesContent);
+
   // Process the data as needed
   const processedData = processData(mdFilesContent);
 
-  res.status(200).json(processedData);
+  const gptResponse = await gptCall(contentString);
+
+  res.status(200).json(gptResponse);
 }
 
-function processData(data: any) {
+async function gptCall(data: string): Promise<any> {
   // Perform your data processing here
-  return data; // Modify this as needed
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: "system", content: data }],
+      model: "gpt-3.5-turbo",
+    });
+
+    return completion;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
 }
 
+async function processData(data: GitHubFileContent[]): Promise<string> {
+  // Perform your data processing here
+  try {
+    let combinedContent = "This is a raw .md file, summarize each section, find and give me the code snippets with their respective summaries: ";
+    const delimiter = "\n\n---\n\n";
+
+    data.forEach(item => {
+      combinedContent += item.content + delimiter;
+    });
+
+    combinedContent = combinedContent.slice(0, -delimiter.length);
+
+    return combinedContent;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+}
