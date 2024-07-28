@@ -1,21 +1,29 @@
-"use client";
-import { SOCIAL_LINKS } from '@/components/social-links/constants'
-import Link from 'next/link'
+
+import React from 'react';
+import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface SocialLinkProps {
-  link: (typeof SOCIAL_LINKS)[number]
+  link: {
+    name: string;
+    url: string;
+    icon: IconDefinition;
+  };
 }
 
 const SocialLink: React.FC<SocialLinkProps> = ({ link }) => {
   return (
     <li>
       <Link href={link.url} passHref>
-        <span className="sr-only">{link.name}</span>
-        <div dangerouslySetInnerHTML={{ __html: link.svg }} />
+        <span className="social-link">
+          <span className="sr-only">{link.name}</span>
+          <FontAwesomeIcon icon={link.icon} className="text-white" />
+        </span>
       </Link>
     </li>
-  )
-}
+  );
+};
 
-export default SocialLink
+export default SocialLink;
 
