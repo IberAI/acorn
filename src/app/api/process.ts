@@ -7,7 +7,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI();
 const octokit = new Octokit({
-  auth: 'process.env.GITHUB_API_KEY'
+  auth: process.env.GITHUB_API_KEY
 });
 
 type GitHubFile = {
@@ -20,13 +20,13 @@ type GitHubFile = {
   git_url: string;
   download_url: string;
   type: string;
+  content?: string;
   _links: {
     self: string;
     git: string;
     html: string;
   };
 };
-
 type GitHubFileContent = {
   path: string;
   content: string;
@@ -34,50 +34,72 @@ type GitHubFileContent = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // External service request
-  // prase the request and get the repoOwner and repoName
   const { repoOwner, repoName, repoPath } = req.body;
 
-  const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-    owner: repoOwner,
-    repo: repoName,
-    path: repoPath,
-    headers: {
-      'X-GitHub-Api-Version': '2022-11-28'
-    }
-  });
 
+  try {
+    let mdFilesContent: GitHubFileContent[]= [];
 
-    const mdFiles = (response.data as GitHubFile[]).filter(file => file.name.endsWith('.md'));
-
-    const mdFilesContentPromises = mdFiles.map(async (file) => {
-      const fileResponse = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+    if (repoPath.endsWith('.md')) {
+      const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
         owner: repoOwner,
         repo: repoName,
-        path: file.path,
+        path: repoPath,
         headers: {
           'X-GitHub-Api-Version': '2022-11-28'
         }
       });
 
-      const fileData = fileResponse.data as GitHubFile & { content: string };
-      const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      const fileData = response.data as GitHubFile;
+      if (fileData.content !== undefined) {
+        const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+        mdFilesContent.push({
+          path: fileData.path,
+          content,
+        });
+      }
 
-      return {
-        path: file.path,
-        content,
-      };
-    });
+    } else {
+      const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+        owner: repoOwner,
+        repo: repoName,
+        path: repoPath,
+        headers: {
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
 
-    const mdFilesContent: GitHubFileContent[] = await Promise.all(mdFilesContentPromises);
-
+      const mdFiles = (response.data as GitHubFile[]).filter(file => file.name.endsWith('.md'));
+  
+      const mdFilesContentPromises = mdFiles.map(async (file) => {
+        const fileResponse = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+          owner: repoOwner,
+          repo: repoName,
+          path: file.path,
+          headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+          }
+        });
+  
+        const fileData = fileResponse.data as GitHubFile & { content: string };
+        const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+  
+        return {
+          path: file.path,
+          content,
+        };
+      });
+      mdFilesContent = await Promise.all(mdFilesContentPromises);
+    }
+    
     const contentString = await processData(mdFilesContent);
+    const gptResponse = await gptCall(contentString);
+  
+    res.status(200).json(gptResponse);
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
 
-  // Process the data as needed
-  const processedData = processData(mdFilesContent);
-
-  const gptResponse = await gptCall(contentString);
-
-  res.status(200).json(gptResponse);
 }
 
 async function gptCall(data: string): Promise<any> {
