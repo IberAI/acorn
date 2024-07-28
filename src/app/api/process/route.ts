@@ -34,8 +34,23 @@ type GitHubFileContent = {
 };
 
 export async function POST(req: NextRequest) {
+  const { isFile, repoOwner, repoName, repoPath, content } = await req.json();
   try {
-    const { repoOwner, repoName, repoPath } = await req.json();
+    let response: string;
+    if (isFile) {
+      response = await fileProcess(content);
+    } else {
+      response = await linkProcess(repoOwner, repoName, repoPath);
+    }
+  
+      
+    return NextResponse.json(response, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+  }
+
+async function linkProcess(repoOwner: string, repoName: string, repoPath: string): Promise<any> {
+  try {
     let mdFilesContent: GitHubFileContent[] = [];
 
     if (repoPath.endsWith('.md')) {
@@ -90,10 +105,19 @@ export async function POST(req: NextRequest) {
       mdFilesContent = await Promise.all(mdFilesContentPromises);
     }
     
-    const contentString = await processData(mdFilesContent);
+    const contentString = await processLinkData(mdFilesContent);
     const gptResponse = await gptCall(contentString);
-  
-    return NextResponse.json(gptResponse, { status: 200 });
+    return gptResponse
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+  }
+}
+
+async function fileProcess(data: string): Promise<any> {
+  try {
+    const prompt = processFileData(data);
+    const gptResponse = await gptCall(data);
+    return gptResponse
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
@@ -113,7 +137,7 @@ async function gptCall(data: string): Promise<any> {
   }
 }
 
-async function processData(data: GitHubFileContent[]): Promise<string> {
+async function processLinkData(data: GitHubFileContent[]): Promise<string> {
   // Perform your data processing here
   try {
     let combinedContent = "This is a raw .md file. Please provide an easy-to-read list of ALL the code snippets along with a summary of what each does. The summary should be based on both the description from the documentation and the code itself. Format the output in markdown as follows: \n" +
@@ -134,3 +158,21 @@ async function processData(data: GitHubFileContent[]): Promise<string> {
   }
 }
 
+  async function processFileData(data: string): Promise<string> {
+    // Perform your data processing here
+    try {
+      let combinedContent = "This is a raw .md file. Please provide an easy-to-read list of ALL the code snippets along with a summary of what each does. The summary should be based on both the description from the documentation and the code itself. Format the output in markdown as follows: \n" +
+       "Function Name: <function_name> \n" + "Description: <description> \n" + 
+       "Summary: <summary_of_what_the_code_does> \n"  + 
+       "Process each function in the .md file similarly.";   ;    
+  
+      combinedContent += data;
+
+      console.log(combinedContent);
+    
+      return combinedContent;
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
+}
