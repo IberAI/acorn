@@ -1,17 +1,27 @@
 
+
 import { addEmailToFirestore } from '@/utils/firebase';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const { email } = req.body;
+export async function POST(req: NextRequest) {
+  try {
+    const { email } = await req.json();
+    const docId = await addEmailToFirestore(email);
+    return NextResponse.json({ message: 'Subscribed successfully!', id: docId }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+  }
+}
 
-    try {
-      const docId = await addEmailToFirestore(email);
-      res.status(200).json({ message: 'Subscribed successfully!', id: docId });
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
-    }
-  } 
+export async function GET(req: NextRequest) {
+  return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
+}
+
+export async function PUT(req: NextRequest) {
+  return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
+}
+
+export async function DELETE(req: NextRequest) {
+  return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
 }
 
