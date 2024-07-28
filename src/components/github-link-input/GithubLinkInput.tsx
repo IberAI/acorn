@@ -9,7 +9,7 @@ interface GithubLinkInputProps {
 const GithubLinkInput: React.FC<GithubLinkInputProps> = ({ githubLink, onChange }) => {
   return (
     <div>
-      <label htmlFor="githubLink" className="block text-sm font-medium text-gray-700">
+      <label htmlFor="githubLink" className="block text-sm font-medium text-white">
         GitHub Link
       </label>
       <input

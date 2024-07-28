@@ -13,13 +13,8 @@ export const SOCIAL_LINKS = [
     icon: faTwitter,
   },
   {
-    name: 'Instagram',
-    url: 'https://instagram.com',
-    icon: faInstagram,
-  },
-  {
     name: 'TikTok',
-    url: 'https://tiktok.com',
+    url: 'https://www.tiktok.com/@acorn_dev?_t=8oOJJxpSa5e&_r=1',
     icon: faTiktok,
   },
   {

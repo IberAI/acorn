@@ -1,15 +1,26 @@
 
 import { signUp } from '@/utils/firebase';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { email, password } = req.body;
-
+export async function POST(req: NextRequest) {
   try {
+    const { email, password } = await req.json();
     const userCredential = await signUp(email, password);
-    res.status(200).json({ user: userCredential.user });
+    return NextResponse.json({ user: userCredential.user }, { status: 200 });
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
 }
+
+export async function GET(req: NextRequest) {
+  return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
+}
+
+export async function PUT(req: NextRequest) {
+  return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
+}
+
+export async function DELETE(req: NextRequest) {
+  return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
+}
+

@@ -1,7 +1,7 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { Octokit } from '@octokit/core';
-import OpenAI from "openai";
+import OpenAI from 'openai';
 
 // import utils here to make it easier
 
@@ -27,18 +27,16 @@ type GitHubFile = {
     html: string;
   };
 };
+
 type GitHubFileContent = {
   path: string;
   content: string;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // External service request
-  const { repoOwner, repoName, repoPath } = req.body;
-
-
+export async function POST(req: NextRequest) {
   try {
-    let mdFilesContent: GitHubFileContent[]= [];
+    const { repoOwner, repoName, repoPath } = await req.json();
+    let mdFilesContent: GitHubFileContent[] = [];
 
     if (repoPath.endsWith('.md')) {
       const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
@@ -95,19 +93,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const contentString = await processData(mdFilesContent);
     const gptResponse = await gptCall(contentString);
   
-    res.status(200).json(gptResponse);
+    return NextResponse.json(gptResponse, { status: 200 });
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
-
 }
 
 async function gptCall(data: string): Promise<any> {
   // Perform your data processing here
   try {
     const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: data }],
-      model: "gpt-3.5-turbo",
+      messages: [{ role: 'system', content: data }],
+      model: 'gpt-3.5-turbo',
     });
 
     return completion;
@@ -119,12 +116,12 @@ async function gptCall(data: string): Promise<any> {
 async function processData(data: GitHubFileContent[]): Promise<string> {
   // Perform your data processing here
   try {
-    let combinedContent = "This is a raw .md file. Please provide an easy-to-read list of ALL the code snippets along with a summary of what each does. The summary should be based on both the description from the documentation and the code itself. Format the output in markdown as follows: \n" +
+    let combinedContent ="This is a raw .md file. Please provide an easy-to-read list of ALL the code snippets along with a summary of what each does. The summary should be based on both the description from the documentation and the code itself. Format the output in markdown as follows: \n" +
      "Function Name: <function_name> \n" + "Description: <description> \n" + 
      "Summary: <summary_of_what_the_code_does> \n" + "Example: \n" + "Function Name: exampleFunction \n" + 
      "Description: This function demonstrates an example. \n" + "Code: " + "function exampleFunction() { \n" +
      "console.log(\"This is an example.\"); \n" + "} \n" + "Summary: This function logs the string \"This is an example.\" to the console. \n" + 
-     "Process each function in the .md file similarly.";    
+     "Process each function in the .md file similarly.";  
      
      const delimiter = "\n\n---\n\n";
 
@@ -139,3 +136,4 @@ async function processData(data: GitHubFileContent[]): Promise<string> {
     throw new Error((error as Error).message);
   }
 }
+
