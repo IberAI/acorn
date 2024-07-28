@@ -10,6 +10,7 @@ const LiveDemoPage: React.FC = () => {
   const [githubLink, setGithubLink] = useState('');
   const [fileName, setFileName] = useState('');
   const [summary, setSummary] = useState('Your summarized README will appear here.');
+  
 
   const handleGithubLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
     setGithubLink(e.target.value);
@@ -20,6 +21,22 @@ const LiveDemoPage: React.FC = () => {
     if (file) {
       setFileName(file.name);
     }
+  };
+
+  const formatSummary = (summary: string): string => {
+    return summary.split(/- Function Name:/g)
+      .filter(section => section.trim() !== '')
+      .map(section => {
+        const [functionNamePart, descriptionPart, summaryTextPart] = section.split(/Description:|Summary:/).map(str => str.trim());
+        return `
+          <div>
+            <p><strong>Function Name:</strong> ${functionNamePart}</p>
+            <p><strong>Description:</strong> ${descriptionPart}</p>
+            <p><strong>Summary:</strong> ${summaryTextPart}</p>
+          </div>
+          <hr>
+        `;
+      }).join('');
   };
 
   const handleSubmission = async () => {
@@ -45,7 +62,8 @@ const LiveDemoPage: React.FC = () => {
       });
 
       const data = await response.json();
-      setSummary(data.choices[0].message.content);
+      const formattedSummary = formatSummary(data.choices[0].message.content);
+      setSummary(formattedSummary);
     } catch (error) {
       setSummary('An error occurred while fetching the summary.');
     }

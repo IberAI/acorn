@@ -10,7 +10,7 @@ const SummaryDisplay: React.FC<SummaryDisplayProps> = ({ summary }) => {
     <div>
       <h2 className="text-lg font-medium text-gray-900">Summary</h2>
       <div className="mt-2 p-4 rounded-md border border-gray-300 bg-gray-50">
-        {summary}
+        <div className="summary-display" dangerouslySetInnerHTML={{ __html: summary }} />
       </div>
     </div>
   );
