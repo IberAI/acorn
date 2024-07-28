@@ -117,7 +117,6 @@ async function fileProcess(data: string): Promise<any> {
   try {
     const prompt = await processFileData(data);
     const gptResponse = await gptCall(prompt);
-    console.log(gptResponse.content);
     return gptResponse
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 });
