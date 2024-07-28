@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useRef, ElementType, ReactNode } from "react";
+import React, { useRef, ElementType, ReactNode, forwardRef } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -21,7 +21,7 @@ interface CustomButtonProps {
   [key: string]: any;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({
+const CustomButton = forwardRef<HTMLElement, CustomButtonProps>(({
   borderRadius = "1.75rem",
   children,
   as: Component = "button",
@@ -30,9 +30,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   duration,
   className,
   ...otherProps
-}) => {
+}, ref) => {
   return (
     <Component
+      ref={ref}
       className={cn(
         "bg-transparent relative text-xl h-16 w-40 p-[1px] overflow-hidden",
         containerClassName
@@ -69,7 +70,9 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       </div>
     </Component>
   );
-};
+});
+
+CustomButton.displayName = "CustomButton";
 
 interface MovingBorderProps {
   children: ReactNode;
