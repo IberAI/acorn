@@ -1,4 +1,4 @@
-
+"use client";
 import React, { ChangeEvent } from 'react';
 
 interface FileUploadProps {

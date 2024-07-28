@@ -1,10 +1,16 @@
 
 "use client";
 import { useState, ChangeEvent } from 'react';
-import { GithubLinkInput } from '@/components/github-link-input';
-import { FileUpload } from '@/components/file-upload';
-import {SummaryDisplay} from '@/components/summary-display';
-
+import dynamic from 'next/dynamic';
+const GithubLinkInput = dynamic(() => import('@/components/github-link-input').then(mod => mod.GithubLinkInput), {
+  ssr: false,
+});
+const FileUpload = dynamic(() => import('@/components/file-upload').then(mod => mod.FileUpload), {
+  ssr: false,
+});
+const SummaryDisplay = dynamic(() => import('@/components/summary-display').then(mod => mod.SummaryDisplay), {
+  ssr: false,
+});
 const LiveDemoPage: React.FC = () => {
   const [githubLink, setGithubLink] = useState('');
   const [fileName, setFileName] = useState('');
