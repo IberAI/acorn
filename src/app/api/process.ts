@@ -119,7 +119,7 @@ async function gptCall(data: string): Promise<any> {
 async function processData(data: GitHubFileContent[]): Promise<string> {
   // Perform your data processing here
   try {
-    let combinedContent = "This is a raw .md file, summarize each section, find and give me the code snippets with their respective summaries: ";
+    let combinedContent = "Using this from a .md file, write an easy to read list of ALL the code snippets and a summary of what each does: ";
     const delimiter = "\n\n---\n\n";
 
     data.forEach(item => {
