@@ -1,11 +1,12 @@
+
 "use client";
 import { cn } from '@/utils/cn'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useState } from 'react'
 import Buttons from '@/components/buttons/buttons'
+
 function NewsletterForm({
   className,
-  onSubmit,
   submitText = 'Submit',
 }: {
   className?: string
@@ -14,13 +15,34 @@ function NewsletterForm({
 }) {
   const [email, setEmail] = useState('')
   const [success, setSuccess] = useState(false)
-  // TODO Firebase auth logic here
+  const [error, setError] = useState('')
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const result = await onSubmit(email)
-    console.log(result)
-    setEmail('')
-    setSuccess(true)
+    setError('')
+    setSuccess(false)
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Something went wrong');
+      }
+
+      const result = await response.json();
+      console.log(result);
+      setEmail('');
+      setSuccess(true);
+    } catch (error: any) {
+      console.error(error);
+      setError(error.message);
+    }
   }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -51,6 +73,9 @@ function NewsletterForm({
           {success && (
             <div className="mt-2 text-xs italic text-gray-500">Email submitted successfully!</div>
           )}
+          {error && (
+            <div className="mt-2 text-xs italic text-red-500">Error: {error}</div>
+          )}
         </div>
 
         <div className="control">
@@ -68,3 +93,4 @@ function NewsletterForm({
 }
 
 export default NewsletterForm
+

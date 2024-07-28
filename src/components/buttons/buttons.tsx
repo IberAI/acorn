@@ -5,7 +5,7 @@ import { CustomButton as MovingBorderButton } from '../moving-border'; // Ensure
 const Buttons = () => {
   return (
     <div className="flex gap-4 mt-8 mx-auto">
-      <Link href="/contact" legacyBehavior>
+      <Link href="/live-demo" legacyBehavior>
           <MovingBorderButton className="text-white" containerClassName="">
             LIVE DEMO
           </MovingBorderButton>

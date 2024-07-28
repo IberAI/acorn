@@ -33,13 +33,7 @@ const Hero: React.FC<HeroProps> = ({ className, content, illustration, title }) 
     return () => ScrollReveal().destroy()
   }, [])
 
-  const onNewsletterSubmit = (values: any) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ values })
-      }, 1000)
-    })
-  }
+
 
   const addToScrollRevealRef: RefCallback<ScrollRevealRefElement> = (el) => {
     if (el && !scrollRevealRef.current.includes(el)) {
@@ -65,7 +59,6 @@ const Hero: React.FC<HeroProps> = ({ className, content, illustration, title }) 
               <NewsletterForm
                 className="mx-auto mt-8 max-w-md lg:mx-0"
                 submitText="Join our mailing list"
-                onSubmit={onNewsletterSubmit}
               />
             </div>
           </div>
