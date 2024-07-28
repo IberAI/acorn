@@ -1,0 +1,8 @@
+/* Add this to your CSS file */
+.hover-smooth {
+    transition: background-color 0.4s ease-in;
+}
+
+.hover-smooth:hover {
+    background-color: #f79627; /* Adjust this to your primary color variable or specific color */
+}
