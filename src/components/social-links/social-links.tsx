@@ -1,6 +1,12 @@
+
+import dynamic from 'next/dynamic';
 import { SOCIAL_LINKS } from '@/components/social-links/constants';
-import SocialLink from '@/components/social-links/social-link';
 import { cn } from '@/utils/cn';
+
+// Dynamic import for SocialLink component
+const SocialLink = dynamic(() => import('@/components/social-links/social-link'), {
+  ssr: false,
+});
 
 function SocialLinks({ className }: { className?: string }) {
   return (
@@ -13,3 +19,4 @@ function SocialLinks({ className }: { className?: string }) {
 }
 
 export default SocialLinks;
+

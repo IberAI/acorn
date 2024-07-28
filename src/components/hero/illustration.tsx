@@ -1,50 +1,61 @@
+
 "use client";
-import { Gradient } from '@/components/gradient'
-import { useEffect, useRef } from 'react'
-import ScrollReveal from 'scrollreveal'
+import { Gradient } from '@/components/gradient';
+import { useEffect, useRef } from 'react';
+
+type ScrollRevealType = typeof import('scrollreveal');
 
 function Illustration({ className }: { className?: string }) {
-  const scrollRevealOneRef = useRef<HTMLDivElement[]>([])
-  const scrollRevealTwoRef = useRef<HTMLDivElement[]>([])
+  const scrollRevealOneRef = useRef<HTMLDivElement[]>([]);
+  const scrollRevealTwoRef = useRef<HTMLDivElement[]>([]);
 
-  const addToScrollRevealOneRef = (el: any) => {
-    scrollRevealOneRef.current.push(el)
-  }
+  const addToScrollRevealOneRef = (el: HTMLDivElement | null) => {
+    if (el && !scrollRevealOneRef.current.includes(el)) {
+      scrollRevealOneRef.current.push(el);
+    }
+  };
 
-  const addToScrollRevealTwoRef = (el: any) => {
-    scrollRevealTwoRef.current.push(el)
-  }
+  const addToScrollRevealTwoRef = (el: HTMLDivElement | null) => {
+    if (el && !scrollRevealTwoRef.current.includes(el)) {
+      scrollRevealTwoRef.current.push(el);
+    }
+  };
 
   useEffect(() => {
-    if (scrollRevealOneRef.current.length > 0) {
-      scrollRevealOneRef.current.map((ref) =>
-        ScrollReveal().reveal(ref, {
-          delay: 1000,
-          duration: 1400,
-          distance: '40px',
-          easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
-          origin: 'bottom',
-          interval: 200,
-        }),
-      )
-    }
+    const loadScrollReveal = async () => {
+      const ScrollReveal: ScrollRevealType = (await import('scrollreveal')).default;
 
-    if (scrollRevealTwoRef.current.length > 0) {
-      scrollRevealTwoRef.current.map((ref) =>
-        ScrollReveal().reveal(ref, {
-          delay: 400,
-          duration: 600,
-          distance: '40px',
-          easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
-          origin: 'right',
-          interval: 150,
-        }),
-      )
-    }
+      if (scrollRevealOneRef.current.length > 0) {
+        scrollRevealOneRef.current.forEach((ref) =>
+          ScrollReveal().reveal(ref, {
+            delay: 1000,
+            duration: 1400,
+            distance: '40px',
+            easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
+            origin: 'bottom',
+            interval: 200,
+          })
+        );
+      }
 
-    return () => ScrollReveal().destroy()
-  }, [])
+      if (scrollRevealTwoRef.current.length > 0) {
+        scrollRevealTwoRef.current.forEach((ref) =>
+          ScrollReveal().reveal(ref, {
+            delay: 400,
+            duration: 600,
+            distance: '40px',
+            easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
+            origin: 'right',
+            interval: 150,
+          })
+        );
+      }
 
+      return () => ScrollReveal().destroy();
+    };
+
+    loadScrollReveal();
+  }, []);
   return (
     <div className={className}>
       <Gradient className="absolute inset-0 lg:hidden" />

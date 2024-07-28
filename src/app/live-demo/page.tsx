@@ -1,14 +1,21 @@
 
 "use client";
 import { useState, ChangeEvent } from 'react';
-import { GithubLinkInput } from '@/components/github-link-input';
-import { FileUpload } from '@/components/file-upload';
-import {SummaryDisplay} from '@/components/summary-display';
-
+import dynamic from 'next/dynamic';
+const GithubLinkInput = dynamic(() => import('@/components/github-link-input').then(mod => mod.GithubLinkInput), {
+  ssr: false,
+});
+const FileUpload = dynamic(() => import('@/components/file-upload').then(mod => mod.FileUpload), {
+  ssr: false,
+});
+const SummaryDisplay = dynamic(() => import('@/components/summary-display').then(mod => mod.SummaryDisplay), {
+  ssr: false,
+});
 const LiveDemoPage: React.FC = () => {
   const [githubLink, setGithubLink] = useState('');
   const [fileName, setFileName] = useState('');
   const [summary, setSummary] = useState('Your summarized README will appear here.');
+  const [fileContent, setFileContent] = useState<string | ArrayBuffer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGithubLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,21 +26,37 @@ const LiveDemoPage: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       setFileName(file.name);
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        if (event.target?.result !== undefined) {
+          setFileContent(event.target.result);
+        }
+      };
+      reader.readAsText(file);
     }
   };
 
   const handleSubmission = async () => {
     setIsLoading(true);
-    const repoDetails = githubLink.split('/').slice(3);
-    const repoOwner = repoDetails[0];
-    const repoName = repoDetails[1];
-    
-    // Check if the URL contains 'blob' or 'tree' and adjust the route accordingly
-    let repoPath = '';
-    if (repoDetails[2] === 'blob' || repoDetails[2] === 'tree') {
-      repoPath = repoDetails.slice(4).join('/');
+    let body;
+
+    if (fileContent) {
+      const content = fileContent as string;
+      body = JSON.stringify({ isFile: true, content });
     } else {
-      repoPath = repoDetails.slice(2).join('/');
+      const repoDetails = githubLink.split('/').slice(3);
+      const repoOwner = repoDetails[0];
+      const repoName = repoDetails[1];
+
+      // Check if the URL contains 'blob' or 'tree' and adjust the route accordingly
+      let repoPath = '';
+      if (repoDetails[2] === 'blob' || repoDetails[2] === 'tree') {
+        repoPath = repoDetails.slice(4).join('/');
+      } else {
+        repoPath = repoDetails.slice(2).join('/');
+      }
+
+      body = JSON.stringify({ isFile: false, repoOwner, repoName, repoPath });
     }
 
     try {
@@ -42,7 +65,7 @@ const LiveDemoPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ repoOwner, repoName, repoPath }),
+        body: body,
       });
 
       const data = await response.json();

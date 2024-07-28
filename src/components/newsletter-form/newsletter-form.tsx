@@ -10,7 +10,6 @@ function NewsletterForm({
   submitText = 'Submit',
 }: {
   className?: string
-  onSubmit: (email: string) => Promise<any>
   submitText?: string
 }) {
   const [email, setEmail] = useState('')
