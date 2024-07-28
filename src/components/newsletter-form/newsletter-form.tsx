@@ -22,7 +22,7 @@ function NewsletterForm({
     setError('')
     setSuccess(false)
     try {
-      const response = await fetch('/api/newsletter/subscribe', {
+      const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
