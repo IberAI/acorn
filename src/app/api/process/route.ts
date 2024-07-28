@@ -1,7 +1,7 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { Octokit } from '@octokit/core';
-import OpenAI from "openai";
+import OpenAI from 'openai';
 
 // import utils here to make it easier
 
@@ -27,18 +27,16 @@ type GitHubFile = {
     html: string;
   };
 };
+
 type GitHubFileContent = {
   path: string;
   content: string;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // External service request
-  const { repoOwner, repoName, repoPath } = req.body;
-
-
+export async function POST(req: NextRequest) {
   try {
-    let mdFilesContent: GitHubFileContent[]= [];
+    const { repoOwner, repoName, repoPath } = await req.json();
+    let mdFilesContent: GitHubFileContent[] = [];
 
     if (repoPath.endsWith('.md')) {
       const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
@@ -95,19 +93,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const contentString = await processData(mdFilesContent);
     const gptResponse = await gptCall(contentString);
   
-    res.status(200).json(gptResponse);
+    return NextResponse.json(gptResponse, { status: 200 });
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
-
 }
 
 async function gptCall(data: string): Promise<any> {
   // Perform your data processing here
   try {
     const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: data }],
-      model: "gpt-3.5-turbo",
+      messages: [{ role: 'system', content: data }],
+      model: 'gpt-3.5-turbo',
     });
 
     return completion;
@@ -139,3 +136,4 @@ async function processData(data: GitHubFileContent[]): Promise<string> {
     throw new Error((error as Error).message);
   }
 }
+

@@ -21,7 +21,7 @@ const LiveDemoPage: React.FC = () => {
       setFileName(file.name);
     }
   };
-
+  // TODO
   const handleSubmission = async () => {
     const repoDetails = githubLink.split('/').slice(-2);
     const repoOwner = repoDetails[0];
