@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fira_Sans } from "next/font/google";
 import "./globals.css";
-import { Layout } from "@/components/layout";,
+import { Layout } from "@/components/layout";
 
 import { Analytics } from "@vercel/analytics/react"
 const inter = Fira_Sans({ subsets: ["latin"], weight: ["400", "700"] });
