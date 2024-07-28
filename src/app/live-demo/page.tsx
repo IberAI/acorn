@@ -70,7 +70,7 @@ const LiveDemoPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 ml-40">
+    <div className="space-y-6 ml-40 w-[40%]">
       <GithubLinkInput githubLink={githubLink} onChange={handleGithubLinkChange} />
       
       <div className="flex justify-center">
@@ -81,7 +81,7 @@ const LiveDemoPage: React.FC = () => {
         <FileUpload fileName={fileName} onChange={handleFileChange} />
       </div>
       
-      <button className="mt-1 block w-40 ml-20 text-sm text-gray-500 mr-4 py-2 px-4 rounded-md border-0 text-sm font-semibold bg-primary-400 text-white hover:bg-primary-500" onClick={handleSubmission}>
+      <button className="ml-40 mt-1 block w-[50%] text-sm text-gray-500 mr-4 py-2 px-4 rounded-md border-0 text-sm font-semibold bg-primary-400 text-white hover:bg-primary-500" onClick={handleSubmission}>
         Submit
       </button>
       
