@@ -45,7 +45,7 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
           transform="rotate(45 32 -4)"
         />
       </g>
-    </svg>
+    </svg>  
   );
 };
 

@@ -1,4 +1,3 @@
-import { Menu } from '@/components/menu'
 import { SocialLinks } from '@/components/social-links'
 
 function Footer() {
@@ -8,9 +7,8 @@ function Footer() {
         <div className="relative flex flex-col items-center gap-6 lg:flex-row lg:items-end lg:justify-between">
           <nav className="flex flex-col items-center gap-6 lg:order-1 lg:items-end">
             <SocialLinks className="flex gap-4" />
-            <Menu className="flex gap-4" />
           </nav>
-          <div className="">&copy; Holly</div>
+          <div className="">&copy; 2024 Acorn</div>
         </div>
       </div>
     </footer>
