@@ -21,12 +21,19 @@ const LiveDemoPage: React.FC = () => {
       setFileName(file.name);
     }
   };
-  // TODO
+
   const handleSubmission = async () => {
-    const repoDetails = githubLink.split('/').slice(-2);
+    const repoDetails = githubLink.split('/').slice(3);
     const repoOwner = repoDetails[0];
     const repoName = repoDetails[1];
-    const repoPath = ''; // Adjust if you have a specific path in mind
+    
+    // Check if the URL contains 'blob' or 'tree' and adjust the route accordingly
+    let repoPath = '';
+    if (repoDetails[2] === 'blob' || repoDetails[2] === 'tree') {
+      repoPath = repoDetails.slice(4).join('/');
+    } else {
+      repoPath = repoDetails.slice(2).join('/');
+    }
 
     try {
       const response = await fetch('/api/process', {
@@ -49,7 +56,7 @@ const LiveDemoPage: React.FC = () => {
       title="Contact"
       imageAlt="Lorem Picsum"
       imageSrc="https://picsum.photos/420/640?grayscale"
-    >
+    > 
       <div className="space-y-4">
         <GithubLinkInput githubLink={githubLink} onChange={handleGithubLinkChange} />
         <FileUpload fileName={fileName} onChange={handleFileChange} />

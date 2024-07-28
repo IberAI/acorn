@@ -118,10 +118,7 @@ async function processData(data: GitHubFileContent[]): Promise<string> {
   try {
     let combinedContent = "This is a raw .md file. Please provide an easy-to-read list of ALL the code snippets along with a summary of what each does. The summary should be based on both the description from the documentation and the code itself. Format the output in markdown as follows: \n" +
      "Function Name: <function_name> \n" + "Description: <description> \n" + 
-     "Summary: <summary_of_what_the_code_does> \n" + "Example: \n" + "Function Name: exampleFunction \n" + 
-     "Description: This function demonstrates an example. \n" + "Code: " + "function exampleFunction() { \n" +
-     "console.log(\"This is an example.\"); \n" + "} \n" + "Summary: This function logs the string \"This is an example.\" to the console. \n" + 
-     "Process each function in the .md file similarly.";    
+     "Summary: <summary_of_what_the_code_does> \n";    
      
      const delimiter = "\n\n---\n\n";
 
