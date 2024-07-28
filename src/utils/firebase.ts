@@ -2,7 +2,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { getAnalytics, logEvent } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -17,23 +16,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const analytics = getAnalytics(app);
 
 export const signUp = async (email: string, password: string) => {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  logEvent(analytics, 'sign_up', { method: 'email' });
   return userCredential;
 };
 
 export const signIn = async (email: string, password: string) => {
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  logEvent(analytics, 'login', { method: 'email' });
   return userCredential;
 };
 
 export const logOut = async () => {
   await signOut(auth);
-  logEvent(analytics, 'logout');
 };
 
 export const addEmailToFirestore = async (email: string) => {
@@ -41,7 +36,6 @@ export const addEmailToFirestore = async (email: string) => {
     email,
     subscribedAt: new Date(),
   });
-  logEvent(analytics, 'newsletter_subscribed', { email });
   return docRef.id;
 };
 
