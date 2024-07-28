@@ -115,8 +115,9 @@ async function linkProcess(repoOwner: string, repoName: string, repoPath: string
 
 async function fileProcess(data: string): Promise<any> {
   try {
-    const prompt = processFileData(data);
-    const gptResponse = await gptCall(data);
+    const prompt = await processFileData(data);
+    const gptResponse = await gptCall(prompt);
+    console.log(gptResponse.content);
     return gptResponse
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 });
@@ -168,8 +169,6 @@ async function processLinkData(data: GitHubFileContent[]): Promise<string> {
        "Process each function in the .md file similarly.";   ;    
   
       combinedContent += data;
-
-      console.log(combinedContent);
     
       return combinedContent;
     } catch (error) {
