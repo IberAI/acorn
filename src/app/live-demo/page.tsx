@@ -70,22 +70,25 @@ const LiveDemoPage: React.FC = () => {
   };
 
   return (
-    <Article
-      title="Contact"
-      imageAlt="Lorem Picsum"
-      imageSrc="https://picsum.photos/420/640?grayscale"
-    > 
-      <div className="space-y-4">
-        <GithubLinkInput githubLink={githubLink} onChange={handleGithubLinkChange} />
-        <FileUpload fileName={fileName} onChange={handleFileChange} />
-        <button className="mt-1 block w-full text-sm text-gray-500 mr-4 py-2 px-4 rounded-md border-0 text-sm font-semibold bg-primary-400 text-white hover:bg-primary-500" onClick={handleSubmission}>
-          Submit
-        </button>
-        <SummaryDisplay summary={summary} />
+    <div className="space-y-6 ml-40">
+      <GithubLinkInput githubLink={githubLink} onChange={handleGithubLinkChange} />
+      
+      <div className="flex justify-center">
+        <p className="text-primary font-bold"> OR </p>
       </div>
-    </Article>
+      
+      <div className="flex justify-center">
+        <FileUpload fileName={fileName} onChange={handleFileChange} />
+      </div>
+      
+      <button className="mt-1 block w-40 ml-20 text-sm text-gray-500 mr-4 py-2 px-4 rounded-md border-0 text-sm font-semibold bg-primary-400 text-white hover:bg-primary-500" onClick={handleSubmission}>
+        Submit
+      </button>
+      
+      <SummaryDisplay summary={summary} />
+    </div>
   );
-};
+} 
 
 export default LiveDemoPage;
 
