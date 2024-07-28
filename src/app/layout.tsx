@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { Layout } from "@/components/layout";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Efficiently summarize technical documents with our advanced Next.js app. Enhance your productivity and streamline your workflow.",
   openGraph: {
     type: 'website',
-    url: 'https://www.yourdomain.com',
+    url: process.env.DOMAIN,
     title: 'TechDoc Summarizer',
     description: 'Efficiently summarize technical documents with our advanced Next.js app. Enhance your productivity and streamline your workflow.',
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'TechDoc Summarizer',
     description: 'Efficiently summarize technical documents with our advanced Next.js app. Enhance your productivity and streamline your workflow.',
   },
-  metadataBase: new URL('https://www.yourdomain.com'),
+  metadataBase: new URL(process.env.DOMAIN || 'https://www.yourfallbackdomain.com'),
   alternates: {
     canonical: '/',
     languages: {
@@ -39,7 +39,11 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Layout>
+          {children}
+        </Layout>
+      </body>
     </html>
   );
 }
